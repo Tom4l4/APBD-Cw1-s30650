@@ -132,4 +132,4 @@ Projekt był rozwijany z użyciem kilku gałęzi roboczych:
 - feature/services  
 - feature/demo  
 
-Po zakończeniu prac zmiany zostały połączone z gałęzią main.****
+Po zakończeniu prac zmiany zostały połączone z gałęzią main.

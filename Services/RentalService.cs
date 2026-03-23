@@ -58,5 +58,10 @@ public class RentalService
     {
         return rentals.Where(r => r.User == user && r.ReturnDate == null && r.EndDate < DateTime.Now).ToList();
     }
+
+    public List<Rental> GetAllRentals()
+    {
+        return rentals;
+    }
 }
 

@@ -58,10 +58,22 @@ public class RentalService
     {
         return rentals.Where(r => r.User == user && r.ReturnDate == null && r.EndDate < DateTime.Now).ToList();
     }
+    
+    public List<Rental> GetOverdueRentals()
+    {
+        return rentals.Where(r => r.ReturnDate == null && r.EndDate < DateTime.Now).ToList();
+    }
+    
+    public Rental GetRental(User user, Equipment equipment)
+    {
+        return rentals.LastOrDefault(r => r.User == user && r.Equipment == equipment);
+    }
 
     public List<Rental> GetAllRentals()
     {
         return rentals;
     }
+    
+    
 }
 

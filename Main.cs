@@ -1,5 +1,6 @@
 ﻿using APBD_Cw1_s30650.Services;
 using APBD_Cw1_s30650.Models.Equipments;
+using APBD_Cw1_s30650.Models.Users;
 using APBD_Cw1_s30650.Enums;
 
 class Program
@@ -24,5 +25,13 @@ class Program
         equipmentService.AddEquipment(laptop4);
         equipmentService.AddEquipment(laptop5);
         equipmentService.AddEquipment(laptop6);
+
+        Student student1 = new Student("Krzysztof", "Kamiński");
+        Student student2 = new Student("Marek", "Nosek");
+        Employee employee = new Employee("Sylwia", "Kacprzak");
+        
+        userService.AddUser(student1);
+        userService.AddUser(student2);
+        userService.AddUser(employee);
     }
 }

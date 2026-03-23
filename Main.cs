@@ -2,6 +2,8 @@
 using APBD_Cw1_s30650.Models.Equipments;
 using APBD_Cw1_s30650.Models.Users;
 using APBD_Cw1_s30650.Enums;
+using APBD_Cw1_s30650.Models.Rentals;
+using System.Text.Json;
 
 class Program
 {
@@ -32,6 +34,7 @@ class Program
         EquipmentService equipmentService = new EquipmentService();
         RentalService rentalService = new RentalService();
         ReportService reportService = new ReportService(equipmentService, rentalService);
+        DataService dataService = new DataService();
 
         Laptop laptop1 = new Laptop("Dell", "XPS", 512, 16, "i7", OS.Windows, 100);
         Laptop laptop2 = new Laptop("HP", "EliteBook", 256, 8, "i5", OS.Linux, 50);
@@ -66,7 +69,13 @@ class Program
             Console.WriteLine("2. Add equipment");
             Console.WriteLine("3. Rent equipment");
             Console.WriteLine("4. Return of equipment");
-            Console.WriteLine("5. View report");
+            Console.WriteLine("5. Change equipment status");
+            Console.WriteLine("6. Show all equipment");
+            Console.WriteLine("7. Show available equipment");
+            Console.WriteLine("8. Show active rentals for user");
+            Console.WriteLine("9. Show overdue rentals");
+            Console.WriteLine("10. View report");
+            Console.WriteLine("11. Save to JSON");
             Console.WriteLine("0. Exit");
             Separator();
             Console.Write("Select an option: ");
@@ -319,39 +328,253 @@ class Program
                     break;
 
                 case "4":
+                {
                     Separator();
                     Console.WriteLine("\n--- RETURN OF EQUIPMENT ---");
 
                     Separator();
                     Console.Write("Enter user ID: ");
-                    int returnUserId = int.Parse(Console.ReadLine() ?? "0");
+                    if (!int.TryParse(Console.ReadLine(), out int returnUserId))
+                    {
+                        ErrorMessage("Invalid user ID.");
+                        break;
+                    }
 
                     Separator();
                     Console.Write("Enter the hardware ID: ");
-                    int returnEquipmentId = int.Parse(Console.ReadLine() ?? "0");
+                    if (!int.TryParse(Console.ReadLine(), out int returnEquipmentId))
+                    {
+                        ErrorMessage("Invalid equipment ID.");
+                        break;
+                    }
 
-                    User returnUser = userService.GetAllUsers().First(u => u.Id == returnUserId);
-                    Equipment returnEquipment = equipmentService.GetAllEquipments().First(e => e.Id == returnEquipmentId);
+                    User returnUser = userService.GetAllUsers().FirstOrDefault(u => u.Id == returnUserId);
+                    Equipment returnEquipment = equipmentService.GetAllEquipments().FirstOrDefault(e => e.Id == returnEquipmentId);
+
+                    if (returnUser == null)
+                    {
+                        ErrorMessage("User not found.");
+                        break;
+                    }
+
+                    if (returnEquipment == null)
+                    {
+                        ErrorMessage("Equipment not found.");
+                        break;
+                    }
 
                     try
                     {
                         rentalService.ReturnEquipment(returnUser, returnEquipment);
+                        Rental returnedRental = rentalService.GetRental(returnUser, returnEquipment);
+
+                        if (returnedRental != null && returnedRental.Penalty > 0)
+                        {
+                            SuccessMessage($"Return completed. Penalty: {returnedRental.Penalty} PLN.");
+                        }
+                        else
+                        {
+                            SuccessMessage("Return completed on time. No penalty.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorMessage($"Error: {ex.Message}");
+                    }
+                    break;
+                }
+                
+                case "5":
+                {
+                    Console.WriteLine("--- CHANGE EQUIPMENT STATUS ---");
+                    Separator();
+
+                    Console.Write("Enter equipment ID: ");
+                    if (!int.TryParse(Console.ReadLine(), out int statusEquipmentId))
+                    {
                         Separator();
-                        SuccessMessage("Refund completed.");
+                        ErrorMessage("Invalid equipment ID.");
+                        break;
+                    }
+
+                    Separator();
+                    Console.WriteLine("Select new status:");
+                    Console.WriteLine("1. Available");
+                    Console.WriteLine("2. Borrowed");
+                    Console.WriteLine("3. Unavailable");
+                    Console.WriteLine("4. UnderRepair");
+                    Separator();
+                    Console.Write("Choose: ");
+
+                    string statusChoice = Console.ReadLine();
+                    EquipmentStatus? newStatus = null;
+
+                    switch (statusChoice)
+                    {
+                        case "1":
+                            newStatus = EquipmentStatus.Available;
+                            break;
+                        case "2":
+                            newStatus = EquipmentStatus.Borrowed;
+                            break;
+                        case "3":
+                            newStatus = EquipmentStatus.Damaged;
+                            break;
+                        case "4":
+                            newStatus = EquipmentStatus.UnderRepair;
+                            break;
+                        default:
+                            Separator();
+                            ErrorMessage("Invalid status.");
+                            break;
+                    }
+
+                    if (newStatus == null)
+                    {
+                        break;
+                    }
+
+                    try
+                    {
+                        equipmentService.SetEquipmentStatus(statusEquipmentId, newStatus.Value);
+                        Separator();
+                        SuccessMessage("Equipment status updated.");
                     }
                     catch (Exception ex)
                     {
                         Separator();
                         ErrorMessage($"Error: {ex.Message}");
                     }
-                    break;
 
-                case "5":
+                    break;
+                }
+                
+                case "6":
+                    Separator();
+                    Console.WriteLine("--- ALL EQUIPMENT ---");
+                    Separator();
+
+                    var allEquipments = equipmentService.GetAllEquipments();
+
+                    if (!allEquipments.Any())
+                    {
+                        ErrorMessage("No equipment found.");
+                        break;
+                    }
+
+                    foreach (var equ in allEquipments)
+                    {
+                        Console.WriteLine($"ID: {equ.Id} | {equ.Brand} {equ.Model} | Status: {equ.Status}");
+                    }
+
+                    Separator();
+                    break;
+                
+                case "7":
+                    Separator();
+                    Console.WriteLine("--- AVAILABLE EQUIPMENT ---");
+                    Separator();
+
+                    var availableEquipments = equipmentService.GetAvailableEquipments();
+
+                    if (!availableEquipments.Any())
+                    {
+                        ErrorMessage("No available equipment.");
+                        break;
+                    }
+
+                    foreach (var equ in availableEquipments)
+                    {
+                        Console.WriteLine($"ID: {equ.Id} | {equ.Brand} {equ.Model} | Status: {equ.Status}");
+                    }
+
+                    Separator();
+                    break;
+                
+                case "8":
+                    Separator();
+                    Console.WriteLine("--- ACTIVE RENTALS FOR USER ---");
+                    Separator();
+                    Console.Write("Enter user ID: ");
+
+                    if (!int.TryParse(Console.ReadLine(), out int activeUserId))
+                    {
+                        ErrorMessage("Invalid user ID.");
+                        break;
+                    }
+
+                    User activeUser = userService.GetAllUsers().FirstOrDefault(u => u.Id == activeUserId);
+
+                    if (activeUser == null)
+                    {
+                        ErrorMessage("User not found.");
+                        break;
+                    }
+
+                    var activeRentals = rentalService.GetActiveRentals(activeUser);
+
+                    if (!activeRentals.Any())
+                    {
+                        ErrorMessage("This user has no active rentals.");
+                        break;
+                    }
+
+                    foreach (var rental in activeRentals)
+                    {
+                        Console.WriteLine(
+                            $"User: {rental.User.FirstName} {rental.User.LastName} | " +
+                            $"Equipment ID: {rental.Equipment.Id} | " +
+                            $"{rental.Equipment.Brand} {rental.Equipment.Model} | " +
+                            $"Start: {rental.StartDate:yyyy-MM-dd HH:mm} | " +
+                            $"End: {rental.EndDate:yyyy-MM-dd HH:mm}"
+                        );
+                    }
+
+                    Separator();
+                    break;
+                case "9":
+                    Separator();
+                    Console.WriteLine("--- OVERDUE RENTALS ---");
+                    Separator();
+
+                    var overdueRentals = rentalService.GetOverdueRentals();
+
+                    if (!overdueRentals.Any())
+                    {
+                        ErrorMessage("No overdue rentals.");
+                        break;
+                    }
+
+                    foreach (var rental in overdueRentals)
+                    {
+                        int lateDays = (DateTime.Now - rental.EndDate).Days;
+
+                        Console.WriteLine(
+                            $"User: {rental.User.FirstName} {rental.User.LastName} | " +
+                            $"Equipment ID: {rental.Equipment.Id} | " +
+                            $"{rental.Equipment.Brand} {rental.Equipment.Model} | " +
+                            $"End date: {rental.EndDate:yyyy-MM-dd HH:mm} | " +
+                            $"Late by: {lateDays} day(s)"
+                        );
+                    }
+
+                    Separator();
+                    break;
+                
+                case "10":
                     Separator();
                     Console.WriteLine("\n--- REPORT ---");
                     Console.WriteLine(reportService.GenerateReport());
 
                     break;
+                
+                case "11":
+                {
+                    dataService.Save(userService, equipmentService, rentalService);
+                    Separator();
+                    SuccessMessage("Data saved to JSON.");
+                    break;
+                }
 
                 case "0":
                     running = false;

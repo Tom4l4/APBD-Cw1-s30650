@@ -2,13 +2,14 @@
 
 namespace APBD_Cw1_s30650.Models;
 
-public class Equipment
+public abstract class Equipment(string brand, string model, decimal price)
 {
     private static int _nextId = 1;
 
     public int Id { get; } = _nextId++;
-    public string Brand { get; set; } = brand;
-    public string Model { get; set; } = model;
-    public EquipmentStatus Status { get; set; } = RoomStatus.Available;
+    public string Brand { get; } = brand;
+    public string Model { get; } = model;
+    public decimal Price { get; set; } = price;
+    public EquipmentStatus Status { get; set; } = EquipmentStatus.Available;
 
 }

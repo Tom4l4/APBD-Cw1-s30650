@@ -1,6 +1,6 @@
 ﻿using APBD_Cw1_s30650.Enums;
 
-namespace APBD_Cw1_s30650.Models.Equipment;
+namespace APBD_Cw1_s30650.Models.Equipments;
 
 public abstract class Equipment(string brand, string model, decimal price)
 {

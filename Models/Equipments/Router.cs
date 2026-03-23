@@ -1,4 +1,4 @@
-﻿namespace APBD_Cw1_s30650.Models.Equipment;
+﻿namespace APBD_Cw1_s30650.Models.Equipments;
 
 public class Router(string brand, string model, string wifiStandard, int maxSpeed, int numberOfPorts, decimal price) : Equipment(brand, model, price)
 {

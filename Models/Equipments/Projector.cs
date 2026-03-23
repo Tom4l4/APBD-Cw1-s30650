@@ -1,4 +1,4 @@
-﻿namespace APBD_Cw1_s30650.Models.Equipment;
+﻿namespace APBD_Cw1_s30650.Models.Equipments;
 
 public class Projector(string brand, string model, int brightness, string resolution, int contrastRatio, decimal price) : Equipment(brand, model, price)
 {

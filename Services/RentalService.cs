@@ -48,5 +48,15 @@ public class RentalService
             rental.Penalty = lateDays * 10m;
         }
     }
+
+    public List<Rental> GetActiveRentals(User user)
+    {
+        return rentals.Where(r => r.User == user && r.ReturnDate == null).ToList();
+    }
+
+    public List<Rental> GetOverdueRentals(User user)
+    {
+        return rentals.Where(r => r.User == user && r.ReturnDate == null && r.EndDate < DateTime.Now).ToList();
+    }
 }
 

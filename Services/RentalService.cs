@@ -16,6 +16,15 @@ public class RentalService
         {
             throw new EquipmentNotAvailableException(equipment.Id);
         }
+        
+        int activeRentals = rentals.Count(r => r.User == user && r.ReturnDate == null);
+        int limit = user is Student ? 2 : 5;
+        
+        if (activeRentals >= limit)
+        {
+            throw new TooManyRentalsException(user.Id);
+        }
+
     }
     
 }

@@ -1,4 +1,6 @@
-﻿namespace APBD_Cw1_s30650.Models;
+﻿using APBD_Cw1_s30650.Enums;
+
+namespace APBD_Cw1_s30650.Models;
 
 public class Equipment
 {
@@ -7,6 +9,6 @@ public class Equipment
     public int Id { get; } = _nextId++;
     public string Brand { get; set; } = brand;
     public string Model { get; set; } = model;
-    public  Status { get; set; } = status;
-    
+    public EquipmentStatus Status { get; set; } = RoomStatus.Available;
+
 }

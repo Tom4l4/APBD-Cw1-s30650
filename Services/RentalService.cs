@@ -38,6 +38,15 @@ public class RentalService
         {
             throw new RentalNotFoundException(user.Id, equipment.Id);
         }
+        
+        rental.ReturnDate = DateTime.Now;
+        equipment.Status = EquipmentStatus.Available;
+
+        if (rental.ReturnDate > rental.EndDate)
+        {
+            int lateDays = (rental.ReturnDate.Value - rental.EndDate).Days;
+            rental.Penalty = lateDays * 10m;
+        }
     }
 }
 

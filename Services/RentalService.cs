@@ -29,6 +29,15 @@ public class RentalService
         rentals.Add(rental);
         equipment.Status = EquipmentStatus.Borrowed;
     }
-    
+
+    public void ReturnEquipment(User user, Equipment equipment)
+    {
+        Rental rental = rentals.FirstOrDefault(r => r.User == user && r.Equipment == equipment && r.ReturnDate == null);
+
+        if (rental == null)
+        {
+            throw new RentalNotFoundException(user.Id, equipment.Id);
+        }
+    }
 }
 

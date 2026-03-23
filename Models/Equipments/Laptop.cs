@@ -1,4 +1,4 @@
-﻿namespace APBD_Cw1_s30650.Models.Equipment;
+﻿namespace APBD_Cw1_s30650.Models.Equipments;
 
 public class Laptop(string brand, string model, int diskSpace, int memory, string processor, OperatingSystem system ,decimal price) : Equipment(brand, model, price)
 {

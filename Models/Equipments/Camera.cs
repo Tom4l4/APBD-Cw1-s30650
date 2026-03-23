@@ -1,4 +1,4 @@
-﻿namespace APBD_Cw1_s30650.Models.Equipment;
+﻿namespace APBD_Cw1_s30650.Models.Equipments;
 
 public class Camera(string brand, string model, string resolution, int opticalZoom, int frameRate, decimal price) : Equipment(brand, model, price)
 {

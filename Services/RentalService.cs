@@ -25,6 +25,9 @@ public class RentalService
             throw new TooManyRentalsException(user.Id);
         }
 
+        Rental rental = new Rental(user, equipment, DateTime.Now, DateTime.Now.AddDays(days));
+        rentals.Add(rental);
+        equipment.Status = EquipmentStatus.Borrowed;
     }
     
 }
